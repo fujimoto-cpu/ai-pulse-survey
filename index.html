@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>AI活用 月次アンケート</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+  :root {
+    --bg: #0f0f14;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent1: #7c5cfc;
+    --accent2: #fc5c7d;
+    --accent3: #43e97b;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --input-bg: #1e1e2e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #1a0a3e 0%, #2d0a4e 40%, #0a1a3e 100%);
+    padding: 48px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(124,92,252,0.25) 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 40%, rgba(252,92,125,0.15) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(124,92,252,0.2);
+    border: 1px solid rgba(124,92,252,0.5);
+    color: #b49dfd;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+  .hero h1 span { color: #b49dfd; }
+  .hero p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .progress-wrap { max-width: 680px; margin: 28px auto 0; padding: 0 24px; }
+  .progress-bar-bg { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label { font-size: 11px; color: var(--muted); text-align: right; margin-top: 6px; }
+
+  .form-wrap { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+  .section { margin-top: 32px; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .question {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+  .question:focus-within { border-color: rgba(124,92,252,0.5); }
+  .q-label {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .q-num {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  input[type="number"], input[type="text"], textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 15px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="number"]:focus, input[type="text"]:focus, textarea:focus { border-color: var(--accent1); }
+  input[type="number"] { max-width: 160px; }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+  .input-unit { display: flex; align-items: center; gap: 10px; }
+  .unit-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+
+  .radio-group, .check-group { display: flex; flex-direction: column; gap: 8px; }
+  .radio-group label, .check-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.15s;
+    font-size: 13px;
+  }
+  .radio-group label:hover, .check-group label:hover {
+    border-color: rgba(124,92,252,0.5);
+    background: rgba(124,92,252,0.06);
+  }
+  input[type="radio"], input[type="checkbox"] {
+    accent-color: var(--accent1);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .scale-wrap { display: flex; gap: 6px; flex-wrap: wrap; }
+  .scale-wrap input[type="radio"] { display: none; }
+  .scale-wrap label {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--muted);
+  }
+  .scale-wrap input[type="radio"]:checked + label {
+    background: var(--accent1);
+    border-color: var(--accent1);
+    color: #fff;
+  }
+  .scale-wrap label:hover { border-color: var(--accent1); color: var(--text); }
+  .scale-desc { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  .submit-wrap { margin-top: 36px; text-align: center; }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 48px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 24px rgba(124,92,252,0.35);
+  }
+  .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  #errorBanner {
+    display: none;
+    max-width: 680px;
+    margin: 16px auto 0;
+    padding: 12px 18px;
+    background: rgba(252, 92, 125, 0.12);
+    border: 1px solid rgba(252, 92, 125, 0.5);
+    color: #ffb3c1;
+    border-radius: 10px;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  #thankyou { display: none; text-align: center; padding: 60px 24px; }
+  #thankyou .ty-icon { font-size: 56px; margin-bottom: 20px; }
+  #thankyou h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; margin-bottom: 10px; }
+  #thankyou p { color: var(--muted); font-size: 14px; }
+
+  .required { color: var(--accent2); margin-left: 3px; }
+
+  select {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 15px;
+    padding: 10px 14px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a9a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  select:focus { border-color: var(--accent1); }
+  select option { background: #1e1e2e; color: var(--text); }
+
+  .other-text-wrap {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+    margin-top: 0;
+  }
+  .other-text-wrap.visible { max-height: 120px; opacity: 1; margin-top: 8px; }
+  .other-text-wrap input[type="text"] {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px dashed var(--accent1);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    padding: 9px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .other-text-wrap input[type="text"]:focus { border-color: var(--accent2); border-style: solid; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Monthly Survey</div>
+  <h1>AI活用 <span>月次アンケート</span></h1>
+  <p>今月のAIツール活用状況を教えてください。回答は約3分で完了します。</p>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 11 回答済み</div>
+  </div>
+</div>
+
+<div id="errorBanner"></div>
+
+<div class="form-wrap">
+  <form id="surveyForm">
+
+    <div class="section">
+      <div class="section-label">👤 回答者</div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">0</span>お名前を選択してください<span class="required">*</span></div>
+        <select name="name" id="nameSelect" required>
+          <option value="" disabled selected>── 選択してください ──</option>
+          <option value="由羽弘明">由羽弘明</option>
+          <option value="鈴木由洋">鈴木由洋</option>
+          <option value="佐々木渉">佐々木渉</option>
+          <option value="山崎丈嗣">山崎丈嗣</option>
+          <option value="佐生竜輔">佐生竜輔</option>
+          <option value="青木和輝">青木和輝</option>
+          <option value="藤本有璃子">藤本有璃子</option>
+          <option value="小林準基">小林準基</option>
+          <option value="川田嘉悠">川田嘉悠</option>
+          <option value="福島優美">福島優美</option>
+          <option value="高垣ひなた">高垣ひなた</option>
+          <option value="小柳雅裕">小柳雅裕</option>
+          <option value="齊藤マミ">齊藤マミ</option>
+          <option value="徳永美里">徳永美里</option>
+          <option value="引地瑞生">引地瑞生</option>
+          <option value="菊田舞">菊田舞</option>
+          <option value="渡部恵">渡部恵</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">⏱ 時間削減</div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">1</span>今月、AIを使って削減できた作業時間は合計何時間ですか？<span class="required">*</span></div>
+        <div class="input-unit">
+          <input type="number" name="q1" min="0" max="999" placeholder="例：20" required>
+          <span class="unit-label">時間 / 月</span>
+        </div>
+      </div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">2</span>AIを使う前と比べて、1日あたりの業務時間はどのくらい変わりましたか？</div>
+        <div class="radio-group">
+          <label><input type="radio" name="q2" value="2h_plus"> 2時間以上短縮できた</label>
+          <label><input type="radio" name="q2" value="1-2h"> 1〜2時間短縮できた</label>
+          <label><input type="radio" name="q2" value="30m-1h"> 30分〜1時間短縮できた</label>
+          <label><input type="radio" name="q2" value="less_30m"> 30分未満の短縮</label>
+          <label><input type="radio" name="q2" value="no_change"> あまり変わらない</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">🌱 新規創出</div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">3</span>今月、AIを活用して新たに生み出した成果物（資料・企画・タスクなど）は何件ですか？<span class="required">*</span></div>
+        <div class="input-unit">
+          <input type="number" name="q3" min="0" max="999" placeholder="例：3" required>
+          <span class="unit-label">件</span>
+        </div>
+      </div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">4</span>AIを活用した主な業務・用途を教えてください（複数選択可）</div>
+        <div class="check-group">
+          <label><input type="checkbox" name="q4" value="doc"> 資料・文書作成</label>
+          <label><input type="checkbox" name="q4" value="research"> 調査・情報収集</label>
+          <label><input type="checkbox" name="q4" value="code"> コーディング・開発</label>
+          <label><input type="checkbox" name="q4" value="plan"> 企画・アイデア出し</label>
+          <label><input type="checkbox" name="q4" value="mail"> メール・文章作成</label>
+          <label><input type="checkbox" name="q4" value="data"> データ分析・集計</label>
+          <label><input type="checkbox" name="q4" id="q4_other" value="other"> その他</label>
+        </div>
+        <div class="other-text-wrap" id="q4_other_wrap">
+          <input type="text" name="q4_other_text" placeholder="具体的に教えてください（例：会議の議事録作成、など）">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">👥 AI浸透度</div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">5</span>今月、AIツールを使った頻度はどのくらいですか？<span class="required">*</span></div>
+        <div class="radio-group">
+          <label><input type="radio" name="q5" value="daily" required> 毎日使った</label>
+          <label><input type="radio" name="q5" value="few_week"> 週3〜4回</label>
+          <label><input type="radio" name="q5" value="once_week"> 週1〜2回</label>
+          <label><input type="radio" name="q5" value="few_month"> 月に数回</label>
+          <label><input type="radio" name="q5" value="not_used"> ほぼ使わなかった</label>
+        </div>
+      </div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">6</span>AIツールの使いやすさを評価してください（1：難しい 〜 5：かんたん）</div>
+        <div class="scale-wrap">
+          <input type="radio" name="q6" id="s1" value="1"><label for="s1">1</label>
+          <input type="radio" name="q6" id="s2" value="2"><label for="s2">2</label>
+          <input type="radio" name="q6" id="s3" value="3"><label for="s3">3</label>
+          <input type="radio" name="q6" id="s4" value="4"><label for="s4">4</label>
+          <input type="radio" name="q6" id="s5" value="5"><label for="s5">5</label>
+        </div>
+        <div class="scale-desc"><span>難しい</span><span>かんたん</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">🆘 困りごと・サポート</div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">7</span>現在、AIツールの活用で困っていることはありますか？<span class="required">*</span></div>
+        <div class="radio-group">
+          <label><input type="radio" name="q7" value="no" required> 特に困っていない</label>
+          <label><input type="radio" name="q7" value="how_to"> 使い方・操作がわからない</label>
+          <label><input type="radio" name="q7" value="quality"> 出力の品質に満足できない</label>
+          <label><input type="radio" name="q7" value="time"> 使う時間が確保できない</label>
+          <label><input type="radio" name="q7" value="use_case"> どの業務に使えばよいかわからない</label>
+          <label><input type="radio" name="q7" id="q7_other" value="other"> その他</label>
+        </div>
+        <div class="other-text-wrap" id="q7_other_wrap">
+          <input type="text" name="q7_other_text" placeholder="具体的に教えてください（例：ツールへのアクセスがしづらい、など）">
+        </div>
+      </div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">8</span>困っている場合、具体的に教えてください（任意）</div>
+        <textarea name="q8" placeholder="例：プロンプトの書き方がよくわからない、など"></textarea>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">💡 振り返り・提案</div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">9</span>今月、最もインパクトがあったAIの活用事例を教えてください（任意）</div>
+        <textarea name="q9" placeholder="例：営業資料の作成時間が3時間から30分に短縮できた、など"></textarea>
+      </div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">10</span>AIツールや社内のAI活用サポートへの改善要望があれば教えてください（任意）</div>
+        <textarea name="q10" placeholder="例：使い方の勉強会を開いてほしい、などご自由にどうぞ"></textarea>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="submit" class="btn-submit" id="submitBtn">回答を送信する →</button>
+    </div>
+  </form>
+
+  <div id="thankyou">
+    <div class="ty-icon">🎉</div>
+    <h2>回答ありがとうございました！</h2>
+    <p>今月も引き続きAIをフル活用していきましょう。<br>集計結果は月末にダッシュボードで共有されます。</p>
+  </div>
+</div>
+
+<script>
+  /* Apps Script Web App のデプロイURL */
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwilnaDDOqgg9HQBLG_eAWqeb4FOQcbhzgin-TWvHd1RVozfdxf8VSz1bLFaVvSj75s/exec';
+
+  const form = document.getElementById('surveyForm');
+  const allInputs = form.querySelectorAll('input, textarea');
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  const errorBanner = document.getElementById('errorBanner');
+  const submitBtn = document.getElementById('submitBtn');
+  const answered = new Set();
+
+  allInputs.forEach(inp => {
+    inp.addEventListener('change', updateProgress);
+    inp.addEventListener('input', updateProgress);
+  });
+  document.getElementById('nameSelect').addEventListener('change', updateProgress);
+
+  function updateProgress() {
+    answered.clear();
+    allInputs.forEach(inp => {
+      const name = inp.name;
+      if (!name) return;
+      if (inp.type === 'radio' && inp.checked) answered.add(name);
+      if (inp.type === 'checkbox' && inp.checked) answered.add(name);
+      if ((inp.type === 'number' || inp.tagName === 'TEXTAREA') && inp.value.trim()) answered.add(name);
+    });
+    if (document.getElementById('nameSelect').value) answered.add('name');
+    const total = 11;
+    const done = Math.min(answered.size, total);
+    fill.style.width = (done / total * 100) + '%';
+    label.textContent = done + ' / ' + total + ' 回答済み';
+  }
+
+  function setupOther(triggerId, wrapId, isCheckbox) {
+    const trigger = document.getElementById(triggerId);
+    const wrap = document.getElementById(wrapId);
+    if (!trigger || !wrap) return;
+    const toggle = () => {
+      if (trigger.checked) {
+        wrap.classList.add('visible');
+        wrap.querySelector('input').focus();
+      } else {
+        wrap.classList.remove('visible');
+        wrap.querySelector('input').value = '';
+      }
+    };
+    trigger.addEventListener('change', toggle);
+    if (!isCheckbox) {
+      const siblings = form.querySelectorAll('input[name="' + trigger.name + '"]');
+      siblings.forEach(sib => {
+        if (sib !== trigger) {
+          sib.addEventListener('change', () => {
+            wrap.classList.remove('visible');
+            wrap.querySelector('input').value = '';
+          });
+        }
+      });
+    }
+  }
+  setupOther('q4_other', 'q4_other_wrap', true);
+  setupOther('q7_other', 'q7_other_wrap', false);
+
+  function collectPayload() {
+    const fd = new FormData(form);
+    const payload = {};
+    ['name','q1','q2','q3','q4_other_text','q5','q6','q7','q7_other_text','q8','q9','q10']
+      .forEach(k => { payload[k] = fd.get(k) || ''; });
+    payload.q4 = fd.getAll('q4');
+    return payload;
+  }
+
+  function showError(msg) {
+    errorBanner.textContent = '⚠️ ' + msg;
+    errorBanner.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* 隠しiframeへGETでURL読み込み（CORS完全回避） */
+  function submitViaIframeGet(url, fields) {
+    return new Promise((resolve) => {
+      const qs = Object.keys(fields)
+        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(fields[k]))
+        .join('&');
+      const fullUrl = url + (url.indexOf('?') >= 0 ? '&' : '?') + qs;
+
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        setTimeout(() => {
+          try { document.body.removeChild(iframe); } catch (e) {}
+        }, 200);
+        resolve();
+      };
+      iframe.addEventListener('load', finish);
+      setTimeout(finish, 6000);
+
+      iframe.src = fullUrl;
+      document.body.appendChild(iframe);
+    });
+  }
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    errorBanner.style.display = 'none';
+
+    if (!GAS_URL || GAS_URL.indexOf('__YOUR_DEPLOYMENT_ID__') !== -1) {
+      showError('送信先（GAS_URL）が未設定です。');
+      return;
+    }
+
+    const payload = collectPayload();
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中…';
+
+    try {
+      await submitViaIframeGet(GAS_URL, { payload: JSON.stringify(payload) });
+      form.style.display = 'none';
+      document.getElementById('thankyou').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error(err);
+      showError('送信に失敗しました：' + err.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = '回答を送信する →';
+    }
+  });
+</script>
+</body>
+</html>
