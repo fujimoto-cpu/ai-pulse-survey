@@ -67,9 +67,14 @@ function handleRequest_(e) {
       params = e.parameter;
     }
 
-    // 動作確認用：payload無しのGETは alive 応答
+    // 動作確認用：payload無しのGETは alive 応答（バージョンマーカー付き）
     if (!params || !params.name) {
-      return jsonOut_({ ok: true, message: 'AI Survey endpoint is alive.' });
+      return jsonOut_({
+        ok: true,
+        message: 'AI Survey endpoint is alive.',
+        version: 'v2-2026-05-21',
+        receivedParams: e ? Object.keys(e.parameter || {}) : []
+      });
     }
 
     // q4は配列で来るのでparametersから補正
